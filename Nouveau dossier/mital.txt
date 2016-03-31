@@ -1,0 +1,26 @@
+NetworkInterface[] devices=JpcapCaptor.getDeviceList();
+JpcapCaptor captor=JpcapCaptor.openDevice(devices[0],2000,false,3000);
+captor.setFilter("arp",true);
+		JpcapSender sender=captor.getJpcapSenderInstance();
+
+byte[] broadcast=new byte[]{(byte)0,(byte)0,(byte)0,(byte)0,(byte)0,(byte)0};
+byte[]srcip=new byte[]{(byte)192,(byte)192,(byte)1,(byte)4};
+		ARPPacket arp=new ARPPacket();
+		arp.hardtype=ARPPacket.HARDTYPE_ETHER;
+		arp.prototype=ARPPacket.PROTOTYPE_IP;
+		arp.operation=ARPPacket.ARP_REQUEST;
+		arp.hlen=6;
+		arp.plen=4;
+		arp.sender_hardaddr=devices[0].mac_address;
+		arp.sender_protoaddr=srcip;
+		arp.target_hardaddr=broadcast;
+		arp.target_protoaddr=;
+		
+		EthernetPacket ether=new EthernetPacket();
+		ether.frametype=EthernetPacket.ETHERTYPE_ARP;
+		ether.src_mac=devices[0].mac_address;
+		ether.dst_mac=broadcast;
+		arp.datalink=ether;
+		
+		sender.sendPacket(arp);
+                
